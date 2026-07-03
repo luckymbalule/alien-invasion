@@ -1,0 +1,20 @@
+[project]
+name = "alien_invasion"
+version = "0.1.0"
+dependencies = [
+    "pygame-ce>=2.5.7"
+]
+requires-python = ">=3.11"
+authors = [
+    {name = "Lucky Mbalule", email = "luckymbalule@gmail.com"}
+]
+readme = "README.md"
+
+[project.optional-dependencies]
+test = [
+    "pytest>=9.0.3"
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = "-v"
