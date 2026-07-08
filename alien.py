@@ -33,7 +33,7 @@ class Alien(Sprite):
         return surface.get_rect().size
 
     def check_edges(self):
-        """Return True if hits display surface edge"""
+        """Return bool on reaching either display edge"""
         return (
             self.rect.left <= 0 
             or self.rect.right >= self.settings.screen_width

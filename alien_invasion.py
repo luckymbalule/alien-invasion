@@ -4,12 +4,14 @@ Entry point for the game.
 
 import sys
 import pygame
+from time import sleep
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
 from fleet import Fleet
 from collision_system import CollisionSystem
 from input_handler import InputHandler
+from game_state import GameState
 
 
 class AlienInvasion:
@@ -24,10 +26,12 @@ class AlienInvasion:
         )
         pygame.display.set_caption("Alien Invasion")    
         self.clock = pygame.time.Clock()
+        self.game_state = GameState(self.settings)
         self.ship = Ship(self.screen, self.settings)
         self.bullets = pygame.sprite.Group()
         self.fleet = Fleet(self.screen, self.settings)
-        self.collision_system = CollisionSystem(self.bullets, self.fleet)
+        self.collision_system = CollisionSystem(self.bullets, self.fleet,
+            self.ship, self.game_state, self.settings.screen_height)
         self._setup_input_handler() # An attempt at command pattern
 
     def run_game(self):
@@ -36,10 +40,14 @@ class AlienInvasion:
             self._check_events()
 
             # Logic update phase
-            self.ship.update()
-            self._update_bullets()
-            self.fleet.update()
-            self.collision_system.update()
+            if self.game_state.is_active:
+                self.ship.update()
+                self._update_bullets()
+                self.fleet.update()
+                self.collision_system.process_combat()
+                fatal_collision = self.collision_system.process_penalties()
+                if fatal_collision and self.game_state.is_active:
+                    sleep(0.5)
 
             # Render phase
             self._update_screen()

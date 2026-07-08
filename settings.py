@@ -13,6 +13,7 @@ class Settings:
     # Ship settings
     ship_height: int = 30
     ship_speed: float = 1.5
+    ship_limit: int = 3
 
     # Bullet settings
     bullet_speed: float = 2.5

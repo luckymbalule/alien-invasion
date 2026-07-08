@@ -1,5 +1,4 @@
 import pytest
-import pygame
 import math
 from alien import Alien
 from fleet import FleetDirection

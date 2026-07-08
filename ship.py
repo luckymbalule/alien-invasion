@@ -16,12 +16,7 @@ class Ship:
             image_path, self.settings.ship_height
         )
         self.rect = self.image.get_rect()
-
-        # Start each ship image at center of screen
-        self.rect.midbottom = self.screen_rect.midbottom
-
-        # Store horizontal ship rect as a float
-        self.precise_x = float(self.rect.x)
+        self.reset()
 
         # Flags to track movement; ship moves when flag is true.
         self.moving_right = False
@@ -42,6 +37,10 @@ class Ship:
 
     def stop_moving_left(self):
         self.moving_left = False
+
+    def reset(self):
+        self.rect.midbottom = self.screen_rect.midbottom
+        self.precise_x = float(self.rect.x)
 
     def update(self):
         """Update ship's position based on movement flags"""

@@ -25,11 +25,11 @@ class Fleet:
     def create(self):
         """Spawns an alien fleet"""
         alien_w, alien_h = Alien.get_size(self.settings.alien_height)
-        row = row_layout(
+        col = col_layout(
             scr_w=self.settings.screen_width,
             asset_w=alien_w
         )
-        col = col_layout(
+        row = row_layout(
             scr_h=self.settings.screen_height,
             asset_h=alien_h,
             top=self.settings.hud_height,
@@ -37,15 +37,20 @@ class Fleet:
             buf_rows=self.settings.alien_buffer_rows
         )
 
-        y_end = col.start + (col.count * col.step)
-        x_end = row.start + (row.count * row.step)
+        y_end = row.start + (row.count * row.step)
+        x_end = col.start + (col.count * col.step)
 
-        for y_position in range(col.start, y_end, col.step):
-            for x_position in range(row.start, x_end, row.step):
+        for y_position in range(row.start, y_end, row.step):
+            for x_position in range(col.start, x_end, col.step):
                 self._add_alien(x_position, y_position)
 
     def draw(self):
         self.aliens.draw(self.screen)
+
+    def reset(self):
+        """Clear and respawn fleet"""
+        self.aliens.empty()
+        self.create()
 
     def update(self):
         """Public entry point to coordinate movement and direction"""

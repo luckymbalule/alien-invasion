@@ -1,17 +1,17 @@
 [project]
-name = "alien_invasion"
-version = "0.1.0"
+name = "alien-invasion"
+version = "0.2.0"
+requires-python = ">=3.11"
+readme = "README.md"
 dependencies = [
     "pygame-ce>=2.5.7"
 ]
-requires-python = ">=3.11"
 authors = [
     {name = "Lucky Mbalule", email = "luckymbalule@gmail.com"}
 ]
-readme = "README.md"
 
 [project.optional-dependencies]
-test = [
+dev = [
     "pytest>=9.0.3"
 ]
 

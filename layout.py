@@ -6,7 +6,7 @@ class LayoutSpec(NamedTuple):
     start: int
 
 
-def row_layout(*, scr_w: int, asset_w: int) -> LayoutSpec:
+def col_layout(*, scr_w: int, asset_w: int) -> LayoutSpec:
     """
     Calculate asset count that fit screen width
 
@@ -20,10 +20,10 @@ def row_layout(*, scr_w: int, asset_w: int) -> LayoutSpec:
     return LayoutSpec(count=int(count), step=int(step), start=int(start))
 
 
-def col_layout(*, scr_h: int, asset_h: int, top: int, bottom: int,
+def row_layout(*, scr_h: int, asset_h: int, top: int, bottom: int,
                 buf_rows=0) -> LayoutSpec:
     """
-    Calculate column in respect to top, bottom and empty buffers
+    Calculates rows fitting screen in respect to y margins and buffer space
 
     Inequality:
     asset_h * (2N - 1) + top + bottom + asset_h * (2*buf_rows - 1) 
