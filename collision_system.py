@@ -1,13 +1,16 @@
 """
-Contains CollisionSystem class to orchestrate all cross-domain
-interactions in one place
+Centralise collision logic to orchestrate all cross-domain interactions
 """
 
 import pygame
+from game_state import GamePhase
 
 
 class CollisionSystem:
-    """Manage all cross-domain interactions"""
+    """
+    Store bullets, fleet, ship, game state and process all cross-domain
+    interactions
+    """
 
     def __init__(self, bullets, fleet, ship, game_state, screen_height):
         self.screen_height = screen_height
@@ -27,7 +30,7 @@ class CollisionSystem:
             self.fleet.create()
 
     def process_penalties(self):
-        """Responds to alien [screen, ship] collisions"""
+        """Responds to collisions requiring a penalty to player"""
         if any(alien.rect.bottom >= self.screen_height
                for alien in self.fleet.aliens
         ) or pygame.sprite.spritecollideany(self.ship, self.fleet.aliens):
@@ -36,10 +39,8 @@ class CollisionSystem:
         return False
 
     def _ship_hit(self):
-        if self.game_state.ships_remaining > 0:
-            self.game_state.ships_remaining -= 1
+        self.game_state.register_ship_loss()
+        if self.game_state.phase == GamePhase.PLAYING:
             self.bullets.empty()
             self.fleet.reset()
             self.ship.reset()
-        else:
-            self.game_state.is_active = False

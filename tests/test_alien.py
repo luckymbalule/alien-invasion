@@ -5,41 +5,48 @@ from fleet import FleetDirection
 
 
 @pytest.fixture
-def alien_setup(mock_game):
-    alien = Alien(mock_game.screen, mock_game.settings)
-    yield alien, mock_game.settings
+def alien_env(fake_game):
+    alien = Alien(fake_game.screen, fake_game.settings)
+    yield alien, fake_game.settings
 
 
 # Test alien movement based on fleet state
 @pytest.mark.parametrize(
     "direction", [FleetDirection.RIGHT, FleetDirection.LEFT]
 )
-def test_alien_movement(direction, alien_setup):
-    alien, settings = alien_setup
-    start_x = alien.precise_x
+def test_update_moves_alien_in_given_direction(direction, alien_env):
+    alien, settings = alien_env
+    expected_x = (
+        alien.precise_x + (settings.alien_speed * direction)
+    )
 
     alien.update(direction)
-    expected_x = (
-        start_x + (settings.alien_speed * direction)
-    )
     
     assert math.isclose(alien.precise_x, expected_x)
 
 
-# Test edge checks
-def test_alien_hits_right_edge_return_true(alien_setup):
-    alien, settings = alien_setup
+def test_check_edges_when_alien_hits_right_edge_return_true(alien_env):
+    alien, settings = alien_env
     alien.rect.right = settings.screen_width
-    assert alien.check_edges() is True
+
+    hit_edge = alien.check_edges()
+
+    assert hit_edge is True
 
 
-def test_alien_hits_left_edge_return_true(alien_setup):
-    alien, _ = alien_setup
+def test_check_edges_when_alien_hits_left_edge_return_true(alien_env):
+    alien, _ = alien_env
     alien.rect.left = 0
-    assert alien.check_edges() is True
+
+    hit_edge = alien.check_edges()
+
+    assert hit_edge is True
 
 
-def test_alien_inside_bounds_return_false(alien_setup):
-    alien, _ = alien_setup
+def test_check_edges_when_alien_inside_bounds_return_false(alien_env):
+    alien, _ = alien_env
     alien.rect.center = alien.screen.get_rect().center
-    assert alien.check_edges() is False
+
+    hit_edge = alien.check_edges()
+
+    assert hit_edge is False

@@ -3,73 +3,101 @@ import pygame
 from fleet import Fleet
 from collision_system import CollisionSystem
 from ship import Ship
-from game_state import GameState
+from game_state import GameState, GamePhase
 
 @pytest.fixture
-def collision_env(mock_game):
+def collision_env(fake_game):
     bullets = pygame.sprite.Group()
-    fleet = Fleet(mock_game.screen, mock_game.settings)
-    ship = Ship(mock_game.screen, mock_game.settings)
-    game_state = GameState(mock_game.settings)
-    collision_system = CollisionSystem(bullets, fleet, ship, game_state,
-                                       mock_game.settings.screen_height)
+    fleet: Fleet = Fleet(fake_game.screen, fake_game.settings)
+    ship: Ship = Ship(fake_game.screen, fake_game.settings)
+    game_state: GameState = GameState(fake_game.settings)
+    collision_system: CollisionSystem = CollisionSystem(bullets, fleet, ship, game_state,
+                                       fake_game.settings.screen_height)
 
-    yield collision_system, mock_game.settings
-
-
-def arrange_dirty_game_state(collision_sys):
-    """Inject dummy items and offset ship position"""
-    dummy_bullet = pygame.sprite.Sprite()
-    dummy_bullet.rect = pygame.Rect((0,0), (1,1))
-    collision_sys.bullets.add(dummy_bullet)
-    collision_sys.ship.rect.x = 0
-    collision_sys.ship.precise_x = 0.0
-
-    return collision_sys.game_state.ships_remaining
+    yield collision_system, ship, fake_game.settings
 
 
-def assert_reset_applied_on_game_end(collision_sys, initial_ships, settings):
-    """Verifies all penalty resets are applied"""
-    assert collision_sys.game_state.ships_remaining == initial_ships - 1
-    assert len(collision_sys.bullets) == 0
-    for alien in collision_sys.fleet.aliens:
-        assert alien.rect.bottom < settings.screen_height
-    
-    center_x = settings.screen_width // 2
-    assert collision_sys.ship.rect.centerx == center_x
-
-
-def test_collision_system_resets_wave_state_on_extinction(collision_env):
-    collision_sys, *_ = collision_env
-    arrange_dirty_game_state(collision_sys)
+def test_process_penalties_when_alien_hits_bottom_edge_reset_combat_state(
+    collision_env
+):
+    collision_sys, ship, settings = collision_env
+    collision_sys.game_state.phase = GamePhase.PLAYING
+    collision_sys.bullets.add(pygame.sprite.Sprite())
+    alien = collision_sys.fleet.aliens.sprites()[0]
+    alien.rect.bottom = settings.screen_height
     initial_alien_count = len(collision_sys.fleet.aliens)
-    assert len(collision_sys.fleet.aliens) > 0
-    assert len(collision_sys.bullets) > 0
 
-    collision_sys.fleet.aliens.empty()
+    critical = collision_sys.process_penalties()
+
+    assert len(collision_sys.bullets) == 0
+    assert collision_sys.ship.rect.centerx == settings.screen_width // 2
+    assert len(collision_sys.fleet.aliens) == initial_alien_count
+    assert critical is True
+
+
+def test_process_penalties_when_alien_hits_last_ship_update_phase(
+    collision_env
+):
+    collision_sys, *_ = collision_env
+    collision_sys.game_state.phase = GamePhase.PLAYING
+    collision_sys.game_state.ships_remaining = 1
+    del collision_sys.fleet.aliens.sprites()[1:]
+    alien = collision_sys.fleet.aliens.sprites()[0]
+    alien.rect.center = collision_sys.ship.rect.center
+
+    critical = collision_sys.process_penalties()
+
+    assert collision_sys.game_state.phase == GamePhase.GAME_OVER
+    assert critical is True
+
+
+def test_process_penalties_when_no_hits_update_nothing(
+    collision_env
+):
+    collision_sys, *_ = collision_env
+    collision_sys.game_state.phase = GamePhase.PLAYING
+    collision_sys.bullets.add(pygame.sprite.Sprite())
+    initial_alien_count = len(collision_sys.fleet.aliens)
+
+    critical = collision_sys.process_penalties()
+
+    assert len(collision_sys.bullets) == 1
+    assert len(collision_sys.fleet.aliens) == initial_alien_count
+    assert critical is False
+
+
+def test_process_combat_when_bullet_hits_alien_removes_both(
+    collision_env
+):
+    collision_sys, *_ = collision_env
+    for _ in range(2):
+        collision_sys.bullets.add(pygame.sprite.Sprite())
+    collision_sys.bullets.sprites()[0].rect = pygame.Rect((0,0), (1,1))
+    collision_sys.bullets.sprites()[1].rect = pygame.Rect((20,10), (1,1))
+    collision_sys.fleet.aliens.sprites()[0].rect.topleft = (0,0)
+    collision_sys.fleet.aliens.sprites()[1].rect.topleft = (50,50)
+    initial_alien_count = len(collision_sys.fleet.aliens)
+    assert len(collision_sys.bullets) == 2
+
     collision_sys.process_combat()
 
-    assert len(collision_sys.fleet.aliens) == initial_alien_count
+    assert len(collision_sys.fleet.aliens) == initial_alien_count - 1
+    assert len(collision_sys.bullets) == 1
+
+
+def test_process_combat_when_bullet_hits_last_alien_resets_combat_state(
+    collision_env
+):
+    collision_sys, _, settings = collision_env
+    collision_sys.bullets.add(pygame.sprite.Sprite())
+    collision_sys.bullets.sprites()[0].rect = pygame.Rect((0,0), (1,1))
+    initial_alien_count = len(collision_sys.fleet.aliens)
+    removal_list = collision_sys.fleet.aliens.sprites()[1:]
+    collision_sys.fleet.aliens.remove(removal_list)
+    collision_sys.fleet.aliens.sprites()[0].rect.topleft = (0,0)
+
+    collision_sys.process_combat()
+
     assert len(collision_sys.bullets) == 0
-
-
-def test_collision_system_resets_screen_on_alien_hitting_bottom_edge(collision_env):
-    collision_sys, settings = collision_env
-    initial_ships = arrange_dirty_game_state(collision_sys)
-    trigger_alien = collision_sys.fleet.aliens.sprites()[0]
-    trigger_alien.rect.bottom = settings.screen_height
-
-    collision_sys.process_penalties()
-
-    assert_reset_applied_on_game_end(collision_sys, initial_ships, settings)
-
-
-def test_collision_system_resets_screen_on_alien_hitting_ship(collision_env):
-    collision_sys, settings = collision_env
-    initial_ships = arrange_dirty_game_state(collision_sys)
-    trigger_alien = collision_sys.fleet.aliens.sprites()[0]
-    trigger_alien.rect.center = collision_sys.ship.rect.center
-
-    collision_sys.process_penalties()
-
-    assert_reset_applied_on_game_end(collision_sys, initial_ships, settings)
+    assert collision_sys.ship.rect.centerx == settings.screen_width // 2
+    assert len(collision_sys.fleet.aliens) == initial_alien_count

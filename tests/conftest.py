@@ -2,8 +2,8 @@ import pytest
 import pygame
 from settings import Settings
 
-class MockGame:
-    """A class to mimic game environment for unit tests"""
+class FakeGame:
+    """Simplifies game environment for unit tests"""
     def __init__(self):
         self.settings = Settings()
         self.screen = pygame.Surface(
@@ -11,10 +11,15 @@ class MockGame:
         )
 
 
+@pytest.fixture
+def fake_game():
+    return FakeGame()
+
+
 @pytest.fixture(autouse=True, scope="session")
-def mock_session():
+def pygame_env():
     """
-    Initialise a single headless SDL display for the entire test session
+    Initialises a single headless SDL display for the testing session
     """
     pygame.init()
     pygame.display.set_mode((1,1), pygame.HIDDEN)
@@ -22,8 +27,3 @@ def mock_session():
     yield
     
     pygame.quit()
-
-
-@pytest.fixture
-def mock_game():
-    return MockGame()
