@@ -6,8 +6,8 @@ from fleet import FleetDirection
 
 @pytest.fixture
 def alien_env(fake_game):
-    alien = Alien(fake_game.screen, fake_game.settings)
-    yield alien, fake_game.settings
+    alien = Alien(fake_game.screen, fake_game.settings, fake_game.difficulty)
+    return alien, fake_game.settings
 
 
 # Test alien movement based on fleet state

@@ -1,20 +1,21 @@
 import pytest
 import pygame
-from fleet import Fleet
 from collision_system import CollisionSystem
-from ship import Ship
-from game_state import GameState, GamePhase
+from game_state import GamePhase
 
 @pytest.fixture
 def collision_env(fake_game):
     bullets = pygame.sprite.Group()
-    fleet: Fleet = Fleet(fake_game.screen, fake_game.settings)
-    ship: Ship = Ship(fake_game.screen, fake_game.settings)
-    game_state: GameState = GameState(fake_game.settings)
-    collision_system: CollisionSystem = CollisionSystem(bullets, fleet, ship, game_state,
-                                       fake_game.settings.screen_height)
+    collision_system: CollisionSystem = CollisionSystem(
+        bullets,
+        fake_game.fleet,
+        fake_game.ship,
+        fake_game.game_state,
+        fake_game.difficulty,
+        fake_game.settings.screen_height
+    )
 
-    yield collision_system, ship, fake_game.settings
+    return collision_system, fake_game.ship, fake_game.settings
 
 
 def test_process_penalties_when_alien_hits_bottom_edge_reset_combat_state(

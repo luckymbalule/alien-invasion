@@ -1,11 +1,9 @@
 import pytest
-from fleet import Fleet
 
 
 @pytest.fixture
 def fleet_env(fake_game):
-    fleet = Fleet(fake_game.screen, fake_game.settings)
-    yield fleet, fake_game.settings
+    return fake_game.fleet, fake_game.settings
 
 
 def test_change_direction_when_fleet_hits_edge_drop_and_reverse_direction(

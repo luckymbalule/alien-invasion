@@ -14,9 +14,10 @@ class FleetDirection(IntEnum):
 class Fleet:
     """Represents an alien fleet"""
 
-    def __init__(self, screen, settings):
+    def __init__(self, screen, settings, difficulty):
         self.screen = screen
         self.settings = settings
+        self.difficulty = difficulty
         self.direction = FleetDirection.RIGHT
         self.aliens = pygame.sprite.Group()
         
@@ -61,7 +62,7 @@ class Fleet:
             self._change_direction()
 
     def _add_alien(self, x_position, y_position):
-        alien = Alien(self.screen, self.settings)
+        alien = Alien(self.screen, self.settings, self.difficulty)
         alien.rect.topleft = (x_position, y_position)
         alien.precise_x = float(x_position)
         self.aliens.add(alien)

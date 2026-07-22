@@ -11,10 +11,11 @@ class Alien(Sprite):
 
     IMAGE_PATH = "images/alien.png"
 
-    def __init__(self, screen, settings):
+    def __init__(self, screen, settings, difficulty):
         super().__init__()
         self.screen = screen
         self.settings = settings
+        self.difficulty = difficulty
 
         # Cache image to optimise performance
         self.image = asset_factory.load_image(
@@ -42,6 +43,6 @@ class Alien(Sprite):
     def update(self, direction_multiplier: int):
         """Update alien position based on speed and direction"""
         self.precise_x += (
-            self.settings.alien_speed * direction_multiplier
+            self.difficulty.alien_speed * direction_multiplier
         )
         self.rect.x = self.precise_x

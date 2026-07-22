@@ -13,7 +13,7 @@ def menu_env(fake_game):
         ButtonConfig("5", False, action=fake_callable),
     ]
 
-    yield menu, buttons
+    return menu, buttons
 
 
 def fake_callable():
@@ -27,6 +27,7 @@ def test_build_when_argument_is_valid_appends_buttons(menu_env):
     menu.build(buttons)
 
     assert len(menu.buttons) == 4
+
 
 @pytest.mark.parametrize("arg",[
     None, [], 2, "Hello", [8,"8"]

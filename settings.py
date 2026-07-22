@@ -10,11 +10,14 @@ class Settings:
     screen_height: int = 640
     bg_color: tuple = (42, 42, 42)
     font: str | None = None
+    base_speed_scale: float = 1.1
 
     # Alien settings
     alien_height: int = 35
     alien_buffer_rows: int = 3
     alien_speed: float = 1.0
+    alien_speed_max: float = 3
+    alien_speed_scale: float = 1.0
 
     # Button settings
     button_width: int = 250
@@ -27,11 +30,13 @@ class Settings:
     button_spacing: int = 20
 
     # Bullet settings
-    bullet_speed: float = 2.5
     bullet_width : int = 3
     bullet_height: int = 15
     bullet_color: tuple = (247, 240, 82)
     bullet_active_limit: int = 4
+    bullet_speed: float = 2.5
+    bullet_speed_max: float = 5.0
+    bullet_speed_scale: float = 0.64
 
     # Fleet settings
     fleet_drop_step: int = 20
@@ -47,4 +52,6 @@ class Settings:
     # Ship settings
     ship_height: int = 30
     ship_speed: float = 1.5
+    ship_speed_max: float = 3.5
+    ship_speed_scale: float = 0.64
     ship_limit: int = 3

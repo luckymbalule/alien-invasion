@@ -8,6 +8,7 @@ from time import sleep
 from bullet import Bullet
 from button import ButtonConfig
 from collision_system import CollisionSystem
+from difficulty import Difficulty
 from fleet import Fleet
 from game_state import GameState, GamePhase
 from input_handler import InputHandler
@@ -23,17 +24,22 @@ class AlienInvasion:
         pygame.init()
 
         self.settings = Settings()
-        self.game_state = GameState(self.settings)
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height)
         )
         pygame.display.set_caption("Alien Invasion")
+        self.difficulty = Difficulty(self.settings)
+        self.game_state = GameState(self.settings)
         self.clock = pygame.time.Clock()
-        self.ship = Ship(self.screen, self.settings)
+        self.ship = Ship(self.screen, self.settings, self.difficulty)
         self.bullets = pygame.sprite.Group()
-        self.fleet = Fleet(self.screen, self.settings)
+        self.fleet = Fleet(self.screen, self.settings, self.difficulty)
         self.collision_system = CollisionSystem(
-            self.bullets, self.fleet,self.ship, self.game_state, 
+            self.bullets,
+            self.fleet,
+            self.ship,
+            self.game_state,
+            self.difficulty,
             self.settings.screen_height
         )
 
@@ -54,8 +60,9 @@ class AlienInvasion:
                 self.fleet.update()
                 self.collision_system.process_combat()
                 critical_collision = self.collision_system.process_penalties()
-                if critical_collision and (
-                    self.game_state.phase == GamePhase.PLAYING
+                if (
+                    critical_collision
+                    and self.game_state.phase == GamePhase.PLAYING
                 ):
                     sleep(0.5)
 
@@ -73,7 +80,12 @@ class AlienInvasion:
 
     def _fire_bullets(self):
         if self.settings.bullet_active_limit > len(self.bullets):
-            new_bullet = Bullet(self.screen, self.settings, self.ship.rect)
+            new_bullet = Bullet(
+                self.screen,
+                self.settings,
+                self.difficulty,
+                self.ship.rect
+            )
             self.bullets.add(new_bullet)
 
     def _on_phase_transition(self, phase):
@@ -116,8 +128,9 @@ class AlienInvasion:
         )
 
     def _return_to_menu(self):
-        if self.game_state.phase == GamePhase.GAME_OVER:
+        if self.game_state.phase in (GamePhase.GAME_OVER, GamePhase.PAUSED):
             self.game_state.reset()
+            self.difficulty.reset()
             self.bullets.empty()
             self.fleet.reset()
             self.ship.reset()
@@ -128,6 +141,7 @@ class AlienInvasion:
         
         self.game_state.reset()
         self.game_state.start()
+        self.difficulty.reset()
         self.bullets.empty()
         self.fleet.reset()
         self.ship.reset()
@@ -143,11 +157,12 @@ class AlienInvasion:
         paused_menu = [
             ButtonConfig("Resume", action=self.game_state.resume),
             ButtonConfig("New Game", action=self._start_game),
+            ButtonConfig("Main Menu", action=self._return_to_menu),
             ButtonConfig("Quit", action=sys.exit),
         ]
         game_over_menu = [
             ButtonConfig("Retry", action=self._start_game),
-            ButtonConfig("Menu", action=self._return_to_menu),
+            ButtonConfig("Main Menu", action=self._return_to_menu),
             ButtonConfig("Quit", action=sys.exit)
         ]
 

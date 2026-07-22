@@ -5,9 +5,10 @@ import asset_factory
 class Ship:
     """Represents a player's ship"""
 
-    def __init__(self, screen, settings):
+    def __init__(self, screen, settings, difficulty):
         self.screen = screen
         self.settings = settings
+        self.difficulty = difficulty
         self.screen_rect = self.screen.get_rect()
 
         # Cache ship surface
@@ -45,9 +46,9 @@ class Ship:
     def update(self):
         """Update ship's position based on movement flags"""
         if self.moving_right and self.rect.right < self.screen_rect.right:
-            self.precise_x += self.settings.ship_speed
+            self.precise_x += self.difficulty.ship_speed
         
         if self.moving_left and self.rect.left > 0:
-            self.precise_x -= self.settings.ship_speed
+            self.precise_x -= self.difficulty.ship_speed
 
         self.rect.x = self.precise_x

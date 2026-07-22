@@ -8,10 +8,11 @@ import pygame
 class Bullet(pygame.sprite.Sprite):
     """Represents bullet sprite"""
 
-    def __init__(self, screen, settings, ship_rect):
+    def __init__(self, screen, settings, difficulty, ship_rect):
         super().__init__()
         self.screen = screen
         self.settings = settings
+        self.difficulty = difficulty
         self.ship_rect = ship_rect
         self.rect = pygame.Rect(
             (0, 0),
@@ -27,5 +28,5 @@ class Bullet(pygame.sprite.Sprite):
 
     def update(self):
         """Process bullet movement"""
-        self.precise_y -= self.settings.bullet_speed
+        self.precise_y -= self.difficulty.bullet_speed
         self.rect.y = self.precise_y

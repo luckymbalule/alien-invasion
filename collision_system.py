@@ -12,12 +12,16 @@ class CollisionSystem:
     interactions
     """
 
-    def __init__(self, bullets, fleet, ship, game_state, screen_height):
+    def __init__(
+        self, bullets, fleet, ship, game_state, difficulty,
+        screen_height
+    ):
         self.screen_height = screen_height
         self.bullets = bullets
         self.fleet = fleet
         self.ship = ship
         self.game_state = game_state
+        self.difficulty = difficulty
 
     def process_combat(self):
         """Responds to alien and bullet collisions"""
@@ -28,6 +32,7 @@ class CollisionSystem:
         if not self.fleet.aliens:
             self.bullets.empty()
             self.fleet.create()
+            self.difficulty.update()
 
     def process_penalties(self):
         """Responds to collisions requiring a penalty to player"""

@@ -1,5 +1,5 @@
 import pytest
-from game_state import GameState, GamePhase
+from game_state import GamePhase
 
 
 class SpySubscriber:
@@ -13,7 +13,7 @@ class SpySubscriber:
 
 @pytest.mark.parametrize("phase", list(GamePhase))
 def test_start_transitions_phase_correctly(phase, fake_game):
-    game_state = GameState(fake_game.settings)
+    game_state = fake_game.game_state
     game_state.phase = phase
 
     game_state.start()
@@ -30,7 +30,7 @@ def test_start_transitions_phase_correctly(phase, fake_game):
     [GamePhase.MENU, GamePhase.PAUSED, GamePhase.GAME_OVER]                         
 )
 def test_start_notifies_subscriber(phase, fake_game):
-    game_state = GameState(fake_game.settings)
+    game_state = fake_game.game_state
     game_state.phase = phase
     spy = SpySubscriber(game_state)
 
@@ -41,7 +41,7 @@ def test_start_notifies_subscriber(phase, fake_game):
 
 @pytest.mark.parametrize("phase", list(GamePhase))
 def test_pause_transitions_phase_correctly(phase, fake_game):
-    game_state = GameState(fake_game.settings)
+    game_state = fake_game.game_state
     game_state.phase = phase
 
     game_state.pause()
@@ -53,7 +53,7 @@ def test_pause_transitions_phase_correctly(phase, fake_game):
 
 
 def test_pause_notifies_subscriber(fake_game):
-    game_state = GameState(fake_game.settings)
+    game_state = fake_game.game_state
     game_state.phase = GamePhase.PLAYING
     spy = SpySubscriber(game_state)
 
@@ -64,7 +64,7 @@ def test_pause_notifies_subscriber(fake_game):
 
 @pytest.mark.parametrize("phase", list(GamePhase))
 def test_resume_transitions_phase_correctly(phase, fake_game):
-    game_state = GameState(fake_game.settings)
+    game_state = fake_game.game_state
     game_state.phase = phase
 
     game_state.resume()
@@ -76,7 +76,7 @@ def test_resume_transitions_phase_correctly(phase, fake_game):
 
 
 def test_resume_notifies_subscriber(fake_game):
-    game_state = GameState(fake_game.settings)
+    game_state = fake_game.game_state
     game_state.phase = GamePhase.PAUSED
     spy = SpySubscriber(game_state)
 
@@ -87,7 +87,7 @@ def test_resume_notifies_subscriber(fake_game):
 
 @pytest.mark.parametrize("phase", list(GamePhase))
 def test_end_transitions_phase_correctly(phase, fake_game):
-    game_state = GameState(fake_game.settings)
+    game_state = fake_game.game_state
     game_state.phase = phase
 
     game_state.end()
@@ -99,7 +99,7 @@ def test_end_transitions_phase_correctly(phase, fake_game):
 
 
 def test_end_notifies_subscriber(fake_game):
-    game_state = GameState(fake_game.settings)
+    game_state = fake_game.game_state
     game_state.phase = GamePhase.PLAYING
     spy = SpySubscriber(game_state)
 
@@ -120,7 +120,7 @@ def test_register_ship_loss_when_phase_playing_update_phase_and_ship_count(
 ):
     initial_count, final_count = count
     initial_phase, final_phase = phase
-    game_state = GameState(fake_game.settings)
+    game_state = fake_game.game_state
     game_state.ships_remaining = initial_count
     game_state.phase = initial_phase
 
@@ -136,7 +136,7 @@ def test_register_ship_loss_when_phase_playing_update_phase_and_ship_count(
 def test_register_ship_loss_when_phase_not_playing_ignored(
     fake_game, phase, count=2
 ):
-    game_state = GameState(fake_game.settings)
+    game_state = fake_game.game_state
     game_state.ships_remaining = count
     game_state.phase = phase
 
