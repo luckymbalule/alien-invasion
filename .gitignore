@@ -9,6 +9,11 @@ __pycache__/
 venv/
 .venv/
 
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+
 # OS
 Thumbs.db
 

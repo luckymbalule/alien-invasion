@@ -1,9 +1,25 @@
-"""Defines the player's ship."""
+"""
+Manages the player's ship and movement
+
+This module contains Ship class for rendering and state management, and
+the ShipDirection enum for standardised directions
+"""
 
 import asset_factory
+from enum import Enum
+
+
+class ShipDirection(Enum):
+    RIGHT = "Right"
+    LEFT = "Left"
+    STATIONARY = "Stationary"
+
 
 class Ship:
-    """Represents a player's ship"""
+    """
+    Manages the player's ship tracking position, direction, and handling
+    screen collisions
+    """
 
     def __init__(self, screen, settings, difficulty):
         self.screen = screen
@@ -19,36 +35,35 @@ class Ship:
         self.rect = self.image.get_rect()
         self.reset()
 
-        # Flags to track movement; ship moves when flag is true.
-        self.moving_right = False
-        self.moving_left = False
-
     def blitme(self):
         """Transfer ship's image to it's current location"""
         self.screen.blit(self.image, self.rect)
 
     def start_moving_right(self):
-        self.moving_right = True
+        self.direction = ShipDirection.RIGHT
 
     def stop_moving_right(self):
-        self.moving_right = False
+        self.direction = ShipDirection.STATIONARY
 
     def start_moving_left(self):
-        self.moving_left = True
+        self.direction = ShipDirection.LEFT
 
     def stop_moving_left(self):
-        self.moving_left = False
+        self.direction = ShipDirection.STATIONARY
 
     def reset(self):
+        self.direction = ShipDirection.STATIONARY
         self.rect.midbottom = self.screen_rect.midbottom
         self.precise_x = float(self.rect.x)
 
     def update(self):
-        """Update ship's position based on movement flags"""
-        if self.moving_right and self.rect.right < self.screen_rect.right:
-            self.precise_x += self.difficulty.ship_speed
-        
-        if self.moving_left and self.rect.left > 0:
-            self.precise_x -= self.difficulty.ship_speed
+        """Update ship's position based on movement flag"""
+        match self.direction:
+            case ShipDirection.RIGHT:
+                if self.rect.right < self.screen_rect.right:
+                    self.precise_x += self.difficulty.ship_speed
+            case ShipDirection.LEFT:
+                if self.rect.left > 0:
+                    self.precise_x -= self.difficulty.ship_speed
 
         self.rect.x = self.precise_x

@@ -15,6 +15,7 @@ from input_handler import InputHandler
 from menu import Menu
 from settings import Settings
 from ship import Ship
+from scoreboard import ScoreBoard
 
 
 class AlienInvasion:
@@ -40,7 +41,13 @@ class AlienInvasion:
             self.ship,
             self.game_state,
             self.difficulty,
-            self.settings.screen_height
+            self.settings
+        )
+        self.score_board = ScoreBoard(
+            self.settings,
+            self.screen,
+            self.game_state,
+            self.difficulty
         )
 
         self._setup_static_key_bindings()
@@ -203,6 +210,7 @@ class AlienInvasion:
             bullet.draw()
         self.ship.blitme()
         self.fleet.draw()
+        self.score_board.draw()
 
         if self.game_state.phase != GamePhase.PLAYING:
             self.active_menu.draw()

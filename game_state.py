@@ -24,6 +24,18 @@ class GameState:
         self.subscribers = []
         self.reset()
 
+    def add_score(self, points):
+        if (
+            not isinstance(points, int)
+            or isinstance(points, bool)
+            or points < 0
+        ):
+            raise TypeError("Add score expects a whole number")
+
+        if self.phase == GamePhase.PLAYING:
+            self.score += points
+                
+
     def end(self):
         if self.phase == GamePhase.PLAYING:
             self._set_phase(GamePhase.GAME_OVER)
@@ -46,6 +58,7 @@ class GameState:
         """Reset phase and ships remaining to initial state"""
         self._set_phase(GamePhase.MENU)
         self.ships_remaining = self.settings.ship_limit
+        self.score = 0
 
     def resume(self):
         if self.phase == GamePhase.PAUSED:

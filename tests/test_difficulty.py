@@ -18,6 +18,6 @@ def test_update_when_at_max_speed_plateaus(fake_game):
 
     difficulty.update()
 
-    assert math.isclose(difficulty.alien_speed, 3.0)
-    assert math.isclose(difficulty.bullet_speed, 5.0)
+    assert math.isclose(difficulty.alien_speed, 4.0)
+    assert math.isclose(difficulty.bullet_speed, 6.0)
     assert math.isclose(difficulty.ship_speed, 3.5)

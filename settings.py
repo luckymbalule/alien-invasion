@@ -11,13 +11,16 @@ class Settings:
     bg_color: tuple = (42, 42, 42)
     font: str | None = None
     base_speed_scale: float = 1.1
+    speed_lerp_range: float = 0.5
+    speed_lerp_steps: int = 5
 
     # Alien settings
     alien_height: int = 35
     alien_buffer_rows: int = 3
     alien_speed: float = 1.0
-    alien_speed_max: float = 3
+    alien_speed_max: float = 4.0
     alien_speed_scale: float = 1.0
+    alien_points: int = 5
 
     # Button settings
     button_width: int = 250
@@ -35,7 +38,7 @@ class Settings:
     bullet_color: tuple = (247, 240, 82)
     bullet_active_limit: int = 4
     bullet_speed: float = 2.5
-    bullet_speed_max: float = 5.0
+    bullet_speed_max: float = 6.0
     bullet_speed_scale: float = 0.64
 
     # Fleet settings
@@ -43,6 +46,11 @@ class Settings:
 
     # HUD settings
     hud_height: int = 60
+    hud_color: tuple = (242, 239, 233)
+    hud_font_size: int = 32
+    hud_margin: int = 30
+    hud_asset_spacing: int = 10
+    hud_asset_height: int = 20
 
     # Menu settings
     menu_bg_color: tuple = (42, 42, 42)
