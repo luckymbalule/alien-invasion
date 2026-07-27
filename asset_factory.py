@@ -6,7 +6,7 @@ import pygame
 
 
 # Cache asset surfaces to optimise perfomance.
-_asset_cache = {}
+_assets_cache = {}
 
 
 def load_image(path: str, target_height: int) -> pygame.Surface:
@@ -16,8 +16,8 @@ def load_image(path: str, target_height: int) -> pygame.Surface:
     cache_key = (path, target_height)
 
     # Lookup cache 
-    if path in _asset_cache:
-        return _asset_cache[cache_key]
+    if cache := _assets_cache.get(cache_key):
+        return cache
     
     image = pygame.image.load(path).convert_alpha()
 
@@ -29,5 +29,5 @@ def load_image(path: str, target_height: int) -> pygame.Surface:
     )
 
     # Cache image using compound key
-    _asset_cache[cache_key] = image
+    _assets_cache[cache_key] = image
     return image

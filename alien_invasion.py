@@ -63,7 +63,7 @@ class AlienInvasion:
             # Logic update phase
             if self.game_state.phase == GamePhase.PLAYING:
                 self.ship.update()
-                self._update_bullets()
+                self.bullets.update()
                 self.fleet.update()
                 self.collision_system.process_combat()
                 critical_collision = self.collision_system.process_penalties()
@@ -194,14 +194,6 @@ class AlienInvasion:
             pygame.K_RIGHT: self.ship.stop_moving_right,
             pygame.K_LEFT: self.ship.stop_moving_left
         }
-
-    def _update_bullets(self):
-        self.bullets.update()
-
-        # Remove bullet if it exceeds top edge
-        for bullet in self.bullets.copy():
-            if bullet.rect.bottom <= 0:
-                self.bullets.remove(bullet)
 
     def _update_screen(self):
         """Renders to the screen surface"""

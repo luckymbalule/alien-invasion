@@ -30,3 +30,6 @@ class Bullet(pygame.sprite.Sprite):
         """Process bullet movement"""
         self.precise_y -= self.difficulty.bullet_speed
         self.rect.y = self.precise_y
+
+        if self.rect.bottom <= 0:
+            self.kill()
