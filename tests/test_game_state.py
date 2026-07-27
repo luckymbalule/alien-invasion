@@ -144,3 +144,49 @@ def test_register_ship_loss_when_phase_not_playing_ignored(
 
     assert game_state.ships_remaining == count
     assert game_state.phase == phase
+
+
+@pytest.mark.parametrize("score, new_score, points",
+    [
+        # Format: score, new score, points
+        (0, 40, 40),
+        (20, 75, 55)
+    ]
+)
+def test_add_score_when_phase_playing_updates_score(
+    fake_game, score, new_score, points
+):
+    game_state = fake_game.game_state
+    game_state.score = score
+    game_state.phase = GamePhase.PLAYING
+
+    game_state.add_score(points)
+
+    assert game_state.score == new_score
+
+
+@pytest.mark.parametrize("phase",
+    (GamePhase.GAME_OVER, GamePhase.PAUSED, GamePhase.MENU)
+)    
+def test_add_score_when_phase_not_playing_score_not_updated(
+    fake_game, phase
+):
+    game_state = fake_game.game_state
+    game_state.phase = phase
+    points = 40
+    game_state.score = 0
+
+    game_state.add_score(points)
+
+    assert game_state.score == 0
+
+
+@pytest.mark.parametrize("points", (-32, 10.3, "jd", True, False, None))
+def test_add_score_when_argument_not_a_whole_number_raises_type_error(
+    fake_game, points
+):
+    game_state = fake_game.game_state
+    game_state.phase = GamePhase.PLAYING
+
+    with pytest.raises(TypeError):
+        game_state.add_score(points)

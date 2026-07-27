@@ -14,9 +14,9 @@ class CollisionSystem:
 
     def __init__(
         self, bullets, fleet, ship, game_state, difficulty,
-        screen_height
+        settings,
     ):
-        self.screen_height = screen_height
+        self.settings = settings
         self.bullets = bullets
         self.fleet = fleet
         self.ship = ship
@@ -25,9 +25,18 @@ class CollisionSystem:
 
     def process_combat(self):
         """Responds to alien and bullet collisions"""
-        pygame.sprite.groupcollide(
+        points = 0
+
+        collisions = pygame.sprite.groupcollide(
             self.bullets, self.fleet.aliens, True, True
         )
+
+        if collisions:
+            for aliens in collisions.values():
+                points += (self.settings.alien_points * len(aliens))
+
+            points *= self.difficulty.level
+            self.game_state.add_score(points)
 
         if not self.fleet.aliens:
             self.bullets.empty()
@@ -36,7 +45,7 @@ class CollisionSystem:
 
     def process_penalties(self):
         """Responds to collisions requiring a penalty to player"""
-        if any(alien.rect.bottom >= self.screen_height
+        if any(alien.rect.bottom >= self.settings.screen_height
                for alien in self.fleet.aliens
         ) or pygame.sprite.spritecollideany(self.ship, self.fleet.aliens):
             self._ship_hit()
